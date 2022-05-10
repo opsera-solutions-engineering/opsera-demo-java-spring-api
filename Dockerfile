@@ -14,5 +14,3 @@ COPY --from=build /home/app/target/java-spring-api-0.0.1-SNAPSHOT.jar /usr/local
 RUN rm -rf /home/app
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","/usr/local/lib/java-spring-api-0.0.1-SNAPSHOT.jar"]
-
-
