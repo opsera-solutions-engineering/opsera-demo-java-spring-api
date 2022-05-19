@@ -4,16 +4,16 @@ data:
 kind: Secret
 metadata:
   creationTimestamp: null
-  name: opsera-demo-java-api-argocd-secret
+  name: java-api-argocd-secret
 type: kubernetes.io/dockerconfigjson 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: opsera-demo-java-api-argocd
+  name: java-api-argocd
 spec:
   selector:
-    app: opsera-demo-java-api-argocd
+    app: java-api-argocd
   ports:
     - port: 8080
       targetPort: 8080
@@ -22,9 +22,9 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: opsera-demo-java-api-argocd
+  name: java-api-argocd
   labels:
-    app: opsera-demo-java-api-argocd
+    app: java-api-argocd
 spec:
   selector:
     matchLabels:
@@ -36,14 +36,14 @@ spec:
   template:
     metadata:
       labels:
-        app: opsera-demo-java-api-argocd
+        app: java-api-argocd
         octopusexport: OctopusExport
     spec:
       imagePullSecrets:
-        - name: opsera-demo-java-api-argocd-secret
+        - name: java-api-argocd-secret
       containers:
         - name: solutions-engineers-demo
           image: 8083-nexus-sotjtgrs.solutions-demo.opsera.io/solutions-engineers-demo:4
           ports:
-            - name: opsera-demo-java-api-argocd
+            - name: java-api-argocd
               containerPort: 8080
