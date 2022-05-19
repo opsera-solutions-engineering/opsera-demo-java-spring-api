@@ -1,0 +1,41 @@
+---
+#Service
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: opsera-demo-java-api-argocd
+  name: opsera-demo-java-api-argocd
+  namespace: dev
+spec:
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+    targetPort: http
+  selector:
+    app: web
+  sessionAffinity: None
+  type: NodePort
+
+---
+# Ingress
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  labels:
+    app.kubernetes.io/name: opsera-demo-java-api-argocd
+  name: opsera-demo-java-api-argocd
+  namespace: argocd
+spec:
+  rules:
+  - host: argocd.nawaz-demo.opsera.io
+    http:
+      paths:
+      - backend:
+          serviceName: opsera-demo-java-api-argocd
+          servicePort: 8080
+        path: /
+---
