@@ -1,62 +1,49 @@
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyI4MDgzLW5leHVzLXNvdGp0Z3JzLnNvbHV0aW9ucy1kZW1vLm9wc2VyYS5pbyI6eyJ1c2VybmFtZSI6Im9wc2VyYS1zb2x1dGlvbnMtZW5naW5lZXJpbmciLCJwYXNzd29yZCI6IlNvbHV0aW9uc0VuZ2luZWVyRG9ja2VyUmVwbyIsImVtYWlsIjoibmF3YXpAb3BzZXJhLmlvIiwiYXV0aCI6ImIzQnpaWEpoTFhOdmJIVjBhVzl1Y3kxbGJtZHBibVZsY21sdVp6cFRiMngxZEdsdmJuTkZibWRwYm1WbGNrUnZZMnRsY2xKbGNHOD0ifX19
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: opsera-demo-java-api-argocd-secret
+type: kubernetes.io/dockerconfigjson 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opsera-demo-java-api-argocd
+spec:
+  selector:
+    app: opsera-demo-java-api-argocd
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: LoadBalancer
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: opsera-demo-java-api-argocd
+  labels:
+    app: opsera-demo-java-api-argocd
 spec:
-  replicas: 1
   selector:
     matchLabels:
-      app: web
+      octopusexport: OctopusExport
+  revisionHistoryLimit: 10
+  replicas: 3
+  strategy:
+    type: RollingUpdate
   template:
     metadata:
       labels:
-        app: web
+        app: opsera-demo-java-api-argocd
+        octopusexport: OctopusExport
     spec:
+      imagePullSecrets:
+        - name: opsera-demo-java-api-argocd-secret
       containers:
-        - name: back-end
-          image: 440953937617.dkr.ecr.us-east-2.amazonaws.com/opsera-nexus-integrator:v1
+        - name: solutions-engineers-demo
+          image: 8083-nexus-sotjtgrs.solutions-demo.opsera.io/solutions-engineers-demo:4
           ports:
-            - containerPort: 8072
-          env:
-          - name: DOCKER_ENV
-            value: "dev"
----
-#Service
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/name: opsera-demo-java-api-argocd
-  name: opsera-demo-java-api-argocd
-spec:
-  ports:
-  - name: http
-    port: 8080
-    protocol: TCP
-    targetPort: http
-  selector:
-    app: web
-  sessionAffinity: None
-  type: NodePort
-
----
-# Ingress
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: nginx
-  labels:
-    app.kubernetes.io/name: opsera-demo-java-api-argocd
-  name: opsera-demo-java-api-argocd
-spec:
-  rules:
-  - host: argocd.nawaz-demo.opsera.io
-    http:
-      paths:
-      - backend:
-          serviceName: opsera-demo-java-api-argocd
-          servicePort: 8080
-        path: /
----
+            - name: opsera-demo-java-api-argocd
+              containerPort: 8080
